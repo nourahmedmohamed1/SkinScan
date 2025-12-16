@@ -71,7 +71,7 @@ class HistoryScreen extends StatelessWidget {
           Icon(
             Icons.history,
             size: 100,
-            color: const Color(0xFF0B5FA5).withOpacity(0.3),
+            color: const Color(0xFF0B5FA5).withValues(alpha: 0.3),
           ),
           const SizedBox(height: 24),
           const Text(
@@ -176,7 +176,7 @@ class HistoryScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.grey.withOpacity(0.3),
+                        color: Colors.grey.withValues(alpha: 0.3),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       ),
@@ -213,7 +213,7 @@ class HistoryScreen extends StatelessWidget {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: resultColor.withOpacity(0.1),
+                          color: resultColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(color: resultColor),
                         ),
@@ -335,7 +335,7 @@ class HistoryScreen extends StatelessWidget {
                         vertical: 10,
                       ),
                       decoration: BoxDecoration(
-                        color: resultColor.withOpacity(0.1),
+                        color: resultColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: resultColor, width: 2),
                       ),

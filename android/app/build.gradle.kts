@@ -8,7 +8,7 @@ plugins {
 android {
     namespace = "com.example.skinscan"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "27.0.12077973" // A widely stable version for late 2025
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

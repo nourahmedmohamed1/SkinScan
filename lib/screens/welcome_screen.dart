@@ -110,7 +110,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
                 child: Container(
                   padding: const EdgeInsets.all(25),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white, width: 2),
                   ),
@@ -128,7 +128,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(15),
-                    boxShadow: [const BoxShadow(color: Colors.black26, blurRadius: 10)],
+                    boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 10)],
                   ),
                   child: const Column(
                     children: [

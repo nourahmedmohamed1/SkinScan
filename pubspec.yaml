@@ -9,6 +9,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  tflite_flutter: ^0.12.1 # Core library for inference
+  image: ^4.3.0 # Optional: Simplifies image/data processing
+
 
   screenshot: ^3.0.0
   gal: ^2.3.2  # أو الإصدار الذي اقترحه لكِ البرنامج
@@ -21,7 +24,6 @@ dependencies:
   # Image Handling & Cropping
   image_picker: ^1.1.2
   image_cropper: ^8.0.2
-  image: ^4.2.0
 
   # State Management
   provider: ^6.1.2
@@ -43,5 +45,4 @@ flutter:
 
   # Asset folders configuration
   assets:
-    - assets/images/
-    - assets/model/
+    - assets/skin_cancer_model_multi.tflite

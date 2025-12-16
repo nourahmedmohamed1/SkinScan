@@ -53,7 +53,7 @@ class HomeScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(50),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF0B5FA5).withOpacity(0.3),
+                        color: const Color(0xFF0B5FA5).withValues(alpha: 0.3),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),
@@ -160,7 +160,7 @@ class HomeScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: isPrimary ? const Color(0xFF0B5FA5).withOpacity(0.2) : Colors.grey.withOpacity(0.1),
+            color: isPrimary ? const Color(0xFF0B5FA5).withValues(alpha: 0.2) : Colors.grey.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -180,7 +180,7 @@ class HomeScreen extends StatelessWidget {
                   width: 50,
                   height: 50,
                   decoration: BoxDecoration(
-                    color: isPrimary ? Colors.white.withOpacity(0.2) : const Color(0xFFEAF4FF),
+                    color: isPrimary ? Colors.white.withValues(alpha: 0.2) : const Color(0xFFEAF4FF),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(icon, size: 24, color: isPrimary ? Colors.white : const Color(0xFF0B5FA5)),
@@ -202,7 +202,7 @@ class HomeScreen extends StatelessWidget {
                         subtitle,
                         style: TextStyle(
                           fontSize: 13,
-                          color: isPrimary ? Colors.white.withOpacity(0.8) : const Color(0xFF6B7280),
+                          color: isPrimary ? Colors.white.withValues(alpha: 0.8) : const Color(0xFF6B7280),
                         ),
                       ),
                     ],
