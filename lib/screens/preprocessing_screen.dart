@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:image_cropper/image_cropper.dart';
-import 'package:provider/provider.dart'; 
+import 'package:provider/provider.dart'; // سطر مضاف
 import 'results_screen.dart';
 import '../services/ai_service.dart';
 import '../models/prediction.dart';
-import '../models/scan_record.dart'; 
-import '../services/scan_history_provider.dart'; 
+import '../models/scan_record.dart'; // سطر مضاف
+import '../services/scan_history_provider.dart'; // سطر مضاف
 
 class PreprocessingScreen extends StatefulWidget {
   final File imageFile;
-  // Note: We don't necessarily need to pass aiResults here because 
-  // this screen allows cropping, so we should run the AI AFTER the user crops.
 
   const PreprocessingScreen({
     super.key,
@@ -25,6 +23,7 @@ class PreprocessingScreen extends StatefulWidget {
 class _PreprocessingScreenState extends State<PreprocessingScreen> {
   late File _currentImage;
   bool _isAnalyzing = false;
+  final AIService _aiService = AIService();
 
   @override
   void initState() {
@@ -32,7 +31,7 @@ class _PreprocessingScreenState extends State<PreprocessingScreen> {
     _currentImage = widget.imageFile;
   }
 
-  // Crop the image
+  // Crop the image - الحفاظ على الدالة كما هي
   Future<void> _cropImage() async {
     try {
       final croppedFile = await ImageCropper().cropImage(
@@ -61,22 +60,17 @@ class _PreprocessingScreenState extends State<PreprocessingScreen> {
     }
   }
 
-  // Modified Analysis Function
+  // دالة التحليل مع الحفظ التلقائي
   Future<void> _runAnalysis() async {
     setState(() {
       _isAnalyzing = true;
     });
 
     try {
-      // 1. Access the AI Service provided in main.dart
-      final aiService = Provider.of<AIService>(context, listen: false);
-
-      // 2. Run analysis on the current (possibly cropped) image
-      // Note: analyzeImage should be a method in your AIService that returns a Prediction model
-      final Prediction prediction = await aiService.analyzeImage(_currentImage);
+      final Prediction prediction = await _aiService.analyzeImage(_currentImage);
 
       if (mounted) {
-        // 3. Save to History automatically
+        // ✨ الحفظ في التاريخ (History) تلقائياً هنا
         final scanRecord = ScanRecord(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           imagePath: _currentImage.path,
@@ -87,7 +81,7 @@ class _PreprocessingScreenState extends State<PreprocessingScreen> {
 
         Provider.of<ScanHistoryProvider>(context, listen: false).addScan(scanRecord);
 
-        // 4. Navigate to Results Screen
+        // الانتقال لصفحة النتائج
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -126,67 +120,105 @@ class _PreprocessingScreenState extends State<PreprocessingScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFFEAF4FF), Colors.white],
+            colors: [
+              Color(0xFFEAF4FF),
+              Colors.white,
+            ],
           ),
         ),
         child: _isAnalyzing
             ? _buildAnalyzingView()
             : SingleChildScrollView(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 20),
-                    _buildImagePreview(),
-                    const SizedBox(height: 32),
-                    const Text(
-                      'Review Your Image',
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF0B2946)),
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 20),
+              // Image Preview
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.3),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
                     ),
-                    const SizedBox(height: 12),
-                    const Text(
-                      'Crop the image if needed to focus on the lesion',
-                      style: TextStyle(fontSize: 16, color: Color(0xFF6B7280)),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 32),
-                    OutlinedButton.icon(
-                      onPressed: _cropImage,
-                      icon: const Icon(Icons.crop),
-                      label: const Text('Crop Image'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xFF0B5FA5),
-                        side: const BorderSide(color: Color(0xFF0B5FA5), width: 2),
-                        padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton.icon(
-                      onPressed: _runAnalysis,
-                      icon: const Icon(Icons.analytics),
-                      label: const Text('Run AI Analysis'),
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 20),
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-                    _buildInfoBox(),
                   ],
                 ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.file(
+                    _currentImage,
+                    fit: BoxFit.cover,
+                    height: 350,
+                  ),
+                ),
               ),
-      ),
-    );
-  }
 
-  Widget _buildImagePreview() {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.grey.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4))],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Image.file(_currentImage, fit: BoxFit.cover, height: 350),
+              const SizedBox(height: 32),
+
+              const Text(
+                'Review Your Image',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF0B2946),
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              const Text(
+                'Crop the image if needed to focus on the lesion',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Color(0xFF6B7280),
+                ),
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: 32),
+
+              // Actions
+              OutlinedButton.icon(
+                onPressed: _cropImage,
+                icon: const Icon(Icons.crop),
+                label: const Text('Crop Image'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: const Color(0xFF0B5FA5),
+                  side: const BorderSide(
+                    color: Color(0xFF0B5FA5),
+                    width: 2,
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 48,
+                    vertical: 16,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              ElevatedButton.icon(
+                onPressed: _runAnalysis,
+                icon: const Icon(Icons.analytics),
+                label: const Text('Run AI Analysis'),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 48,
+                    vertical: 20,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 32),
+
+              _buildInfoBox(),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -197,22 +229,42 @@ class _PreprocessingScreenState extends State<PreprocessingScreen> {
       decoration: BoxDecoration(
         color: const Color(0xFFEAF4FF),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF0B5FA5).withValues(alpha: 0.3)),
+        border: Border.all(
+          color: const Color(0xFF0B5FA5).withOpacity(0.3),
+        ),
       ),
       child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.info_outline, color: Color(0xFF0B5FA5), size: 20),
+              Icon(
+                Icons.info_outline,
+                color: Color(0xFF0B5FA5),
+                size: 20,
+              ),
               SizedBox(width: 8),
-              Text('What happens next?', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+              Text(
+                'What happens next?',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF0B2946),
+                ),
+              ),
             ],
           ),
           SizedBox(height: 12),
           Text(
-            'Our AI will analyze the image and provide classification and confidence score.',
-            style: TextStyle(fontSize: 14, color: Color(0xFF6B7280), height: 1.5),
+            'Our AI will analyze the image and provide:\n'
+                '• Classification (Benign or Suspicious)\n'
+                '• Confidence score\n'
+                '• Recommendation to consult a doctor',
+            style: TextStyle(
+              fontSize: 14,
+              color: Color(0xFF6B7280),
+              height: 1.5,
+            ),
           ),
         ],
       ),
@@ -220,18 +272,72 @@ class _PreprocessingScreenState extends State<PreprocessingScreen> {
   }
 
   Widget _buildAnalyzingView() {
-    return const Center(
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(
-            strokeWidth: 6,
-            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0B5FA5)),
+          const SizedBox(
+            width: 100,
+            height: 100,
+            child: CircularProgressIndicator(
+              strokeWidth: 8,
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0B5FA5)),
+            ),
           ),
-          SizedBox(height: 24),
-          Text("AI is processing image...", style: TextStyle(fontSize: 18, color: Color(0xFF0B5FA5))),
+
+          const SizedBox(height: 32),
+
+          const Text(
+            'Analyzing Image...',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF0B2946),
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          const Text(
+            'Please wait while our AI examines the lesion',
+            style: TextStyle(
+              fontSize: 16,
+              color: Color(0xFF6B7280),
+            ),
+            textAlign: TextAlign.center,
+          ),
+
+          const SizedBox(height: 48),
+
+          // Progress Steps
+          _buildProgressStep('Preprocessing image', true),
+          const SizedBox(height: 12),
+          _buildProgressStep('Running AI model', true),
+          const SizedBox(height: 12),
+          _buildProgressStep('Generating results', true),
         ],
       ),
+    );
+  }
+
+  Widget _buildProgressStep(String label, bool isActive) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(
+          isActive ? Icons.hourglass_empty : Icons.check_circle,
+          color: const Color(0xFF0B5FA5),
+          size: 20,
+        ),
+        const SizedBox(width: 8),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 14,
+            color: Color(0xFF6B7280),
+          ),
+        ),
+      ],
     );
   }
 }

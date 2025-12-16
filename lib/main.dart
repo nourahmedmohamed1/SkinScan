@@ -1,30 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:skinscan/services/ai_service.dart';
 import 'screens/welcome_screen.dart'; // Import the new Welcome Screen
 import 'services/scan_history_provider.dart';
 
-void main() async {
-  // 1. Mandatory: Initialize Flutter bindings for platform channels
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // 2. Load the AI Model immediately at startup
-  final aiService = AIService();
-  await aiService.loadModel();
-
-  runApp(
-    // 3. Use MultiProvider to include your new AIService
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => ScanHistoryProvider()),
-        // Provide the already-loaded AI service to the whole app
-        Provider<AIService>.value(value: aiService),
-      ],
-      child: const MyApp(),
-    ),
-  );
+void main() {
+  runApp(const MyApp());
 }
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -71,6 +52,4 @@ class MyApp extends StatelessWidget {
       ),
     );
   }
-
-
 }
